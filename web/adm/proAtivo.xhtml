@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/recursos/template/template.xhtml">
+
+	<ui:define name="tituloPagina">
+		  Pro-Ativo
+	</ui:define>
+	<ui:define name="tituloPrincipal">
+		<i class="fa fa fa-edit"> </i> Pro-Ativo</ui:define>
+	<ui:define name="tituloSecundario"></ui:define>
+
+	<ui:define name="botoesAcao"></ui:define>
+
+	<ui:insert name="eventos">
+
+		<f:metadata>
+
+			<f:event listener="#{loginBean.validaPagina('sistema')}"
+				type="preRenderView" />
+			<f:event listener="#{loginBean.validarLogin()}" type="preRenderView" />
+			<f:event listener="#{loginBean.isAdmRedireciona()}"
+				type="preRenderView" />
+
+		</f:metadata>
+
+	</ui:insert>
+
+	<ui:define name="conteudo">
+
+		<p:panel header="Pró-Ativo">
+
+			<h:form>				
+
+				<p:fieldset legend="Remover Lote" toggleable="true"
+					toggleSpeed="500">
+
+					<p:dataTable var="lots"
+						value="#{defeitoSideBean.listarLotes()}" style="width: 30%;"
+						emptyMessage="Não há lotes com defeitos abertos">
+
+						<p:column headerText="Lote">
+
+							<h:outputText value="#{lots}" />
+
+						</p:column>
+
+						<p:column headerText="Ação" style="width: 45px;">
+
+							<p:commandButton icon="fa fa-remove"
+								title="Remover defeitos do lote"
+								action="#{loteBean.removerLoteEspecifico()}" update="@all">
+
+								<f:setPropertyActionListener value="#{lots}"
+									target="#{loteBean.lote.nome}" />
+								
+								<f:actionListener binding="#{atendimentoBean.buscarDefeitosSideAtivo()}"/>
+								
+							</p:commandButton>
+
+						</p:column>
+
+					</p:dataTable>
+
+				</p:fieldset>
+
+				<br />
+
+				<p:dataTable
+					value="#{defeitoSideBean.listarDefeitoSideEmTratamento()}"
+					var="defeitoSideTratamento"
+					emptyMessage="Não há defeitos sendo tratados"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+					paginator="true" rows="10"
+					currentPageReportTemplate="[{startRecord} de {endRecord}]"
+					filteredValue="#{defeitoSideBean.listaFiltrada}">
+
+					<p:column headerText="Instancia">
+
+						<h:outputText value="#{defeitoSideTratamento.instancia}" />
+
+					</p:column>
+
+					<p:column headerText="Tipificação">
+
+						<h:outputText value="#{defeitoSideTratamento.tipificacao.nome}" />
+
+					</p:column>
+
+					<p:column headerText="Data integrado">
+
+						<h:outputText
+							value="#{defeitoSideTratamento.dataIntegradoFormatado}" />
+
+					</p:column>
+
+					<p:column headerText="Usuário"
+						filterBy="#{defeitoSideTratamento.usuarioEfika.login}"
+						filterMatchMode="contains">
+
+						<h:outputText value="#{defeitoSideTratamento.usuarioEfika.login}" />
+
+					</p:column>
+
+					<p:column headerText="Lote">
+
+						<h:outputText value="#{defeitoSideTratamento.lote.nome}" />
+
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 80px;">
+
+						<p:commandButton icon="fa fa-arrow-circle-left"
+							title="Volta defeito para fila"
+							action="#{defeitoSideBean.voltarDefeitoParaFila(defeitoSideTratamento)}"
+							update="@all" />
+						<p:commandButton icon="fa fa-arrow-circle-right"
+							action="#{defeitoSideBean.modificarDefeitoSideRemoveLista(defeitoSideTratamento)}"
+							title="Remove defeito da lista" update="@all" />
+
+					</p:column>
+
+				</p:dataTable>
+
+			</h:form>
+
+		</p:panel>
+
+	</ui:define>
+</ui:composition>
+</html>
